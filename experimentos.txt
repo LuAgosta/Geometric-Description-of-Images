@@ -1,0 +1,24 @@
+Experimentos: (Generar las capturas para Gloria y Coloma)
+  -> Conjunto imágenes: Army, Venus, Sintel (elegir dos)
+  -> Inicializando con Ground truth
+  -> Matches NNF (Census 5x5 sobre tres canales)
+  -> R = + 5 bounding box (Tamño mínimo de 11x11 = 121 pixels)
+  -> Pesos Gaussianos (con +/- 2sigma) = 95% de los pesos.
+
+
+  I. Experimentos sin fase aleatoria.
+
+
+
+
+
+  II. Experimentos con fase aleatoria.
+
+
+
+
+
+
+
+
+  OBS: Tarda mucho tiempo en resolver el mejor candidato para cc.

@@ -1,0 +1,100 @@
+
+
+ add_executable (PatchMatchMultiScale      
+                 l1_norm_patch_distance.cpp          
+                 l2_norm_patch_distance.cpp          
+                 l2_combined_patch_distance.cpp
+                 sampling.cpp
+                 a_patch_distance.cpp
+                 point.cpp
+                 distance_transform.cpp  
+                 patch_match_multi_scale.cpp    
+                 patch_match.cpp             
+                 gaussian_weights.cpp        
+                 main_patch_match_multi_nnf.cpp                    
+                 io_utility.cpp    
+                 mask_iterator.cpp           
+                 patchsize.cpp
+                 gradient.cpp
+                 mask.cpp
+                 image.hpp
+                 image.h       
+                 l1_norm_patch_distance.h          
+                 l2_norm_patch_distance.h          
+                 l2_combined_patch_distance.h
+                 sampling.h
+                 a_patch_distance.h
+                 point.h
+                 distance_transform.h     
+                 patch_match_multi_scale.h 
+                 patch_match.h             
+                 gaussian_weights.h        
+                 io_utility.h         
+                 mask_iterator.h           
+                 patchsize.h
+                 gradient.h
+                 mask.h
+                 3rdparty/simpois/simpois.c
+                )
+ target_link_libraries(PatchMatchMultiScale ${LIBS})
+ SET_TARGET_PROPERTIES(PatchMatchMultiScale PROPERTIES
+       COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS} ${OpenMP_CXX_FLAGS}")
+      
+
+add_executable (PatchMatchTreeCC
+                l1_norm_patch_distance.cpp          
+                census_norm_patch_distance.cpp
+                l1_norm_cc_distance.cpp
+                complete_rank_transform.cpp
+                census_transform.cpp
+                complete_rank_transform_patch_distance.cpp
+                complete_rank_transform_cc_distance.cpp
+                census_norm_cc_distance.cpp
+                census_norm_patch_distance.cpp
+                a_patch_distance.cpp
+                a_cc_distance.cpp
+                point.cpp
+                distance_transform.cpp      
+                patch_match.cpp   
+                patch_match_tree_cc.cpp          
+                gaussian_weights.cpp   
+                main_check_cc.cpp                        
+                io_utility.cpp 
+                flst_utility.cpp             
+                mask_iterator.cpp           
+                patchsize.cpp
+                gradient.cpp
+                mask.cpp
+                image.hpp
+                image.h       
+                l1_norm_patch_distance.h          
+                census_norm_patch_distance.h
+                l1_norm_cc_distance.h
+                complete_rank_transform.h
+                complete_rank_transform_patch_distance.h
+                complete_rank_transform_cc_distance.h
+                census_transform.h
+                census_norm_cc_distance.h
+                census_norm_patch_distance.h
+                a_patch_distance.h
+                a_cc_distance.h
+                point.h
+                distance_transform.h      
+                patch_match.h    
+                patch_match_tree_cc.h         
+                gaussian_weights.h        
+                io_utility.h    
+                flst_utility.h          
+                mask_iterator.h            
+                patchsize.h
+                gradient.h
+                mask.h
+                3rdparty/simpois/simpois.c
+                3rdparty/bicubic_interpolation/bicubic_interpolation.c
+                3rdparty/bicubic_interpolation/bicubic_interpolation.h
+                3rdparty/bicubic_interpolation/bicubic_interpolation_uchar.c
+                3rdparty/bicubic_interpolation/bicubic_interpolation_uchar.h
+               )
+target_link_libraries(PatchMatchTreeCC ${LIBS})
+SET_TARGET_PROPERTIES(PatchMatchTreeCC PROPERTIES
+      COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS} ${OpenMP_CXX_FLAGS}")

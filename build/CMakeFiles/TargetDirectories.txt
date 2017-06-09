@@ -1,0 +1,3 @@
+/home/roberto/Desktop/FLST_Lucie/code/build/3rdparty/flst/CMakeFiles/FLSTLIB.dir
+/home/roberto/Desktop/FLST_Lucie/code/build/CMakeFiles/FLST_test.dir
+/home/roberto/Desktop/FLST_Lucie/code/build/3rdparty/iio/CMakeFiles/IIOLIB.dir
