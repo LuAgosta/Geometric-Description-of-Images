@@ -96,20 +96,20 @@ int main(int argc, char *argv[])
 
   //Creation of Images channel = 3 /*Lucie*/
   // FixedImage<float> *newImage = new FixedImage<float>(500, 500, (uint)3); 
-  // newImage->draw_rect (0 , 0, 499, 499,0, 50) ; 
-  // newImage->draw_rect (100 , 100, 300, 300,1, 200) ; 
-  // newImage->draw_rect (150, 90, 100, 9,2,  100) ; 
-  // newImage->draw_rect (401, 150, 10, 50,0, 100) ; 
+  // newImage->draw_rect (0 , 0, 499, 499,2, 50) ; 
+  // newImage->draw_rect (100 , 100, 300, 300 ,2, 100) ; 
+  // newImage->draw_rect (100, 150, 300, 100,2,  200) ; 
+  // newImage->draw_rect (100, 300, 300, 70,2, 200) ; 
   // IOUtility::write_rgb_image(a_name, *newImage);
   // printf("number of channels of newImage: %d \n" , newImage->get_number_of_channels()) ;
 
   //Creation of Images channel = 1 /*Lucie*/
-  // FixedImage<float> *newImage = new FixedImage<float>(500, 500,(float)50); 
-  // newImage->draw_rect (100 , 100, 300, 300, 200) ; 
-  // newImage->draw_rect (150, 90, 100, 9, 100) ; 
-  // newImage->draw_rect (401, 150, 10, 50, 100) ; 
-  // IOUtility::write_mono_image(a_name, *newImage);
-  // printf("number of channels of newImage: %d \n" , newImage->get_number_of_channels()) ;
+/*  FixedImage<float> *newImage = new FixedImage<float>(500, 500,(float)50); 
+  newImage->draw_rect (100 , 100, 300, 300, 200) ; 
+  newImage->draw_rect (150, 100, 100, 10, 100) ; 
+  newImage->draw_rect (390, 150, 10, 50, 100) ; 
+  IOUtility::write_mono_image(a_name, *newImage);
+  printf("number of channels of newImage: %d \n" , newImage->get_number_of_channels()) ;*/
 
 
 #ifdef DBG_OUTPUT
@@ -120,11 +120,13 @@ int main(int argc, char *argv[])
   // read image and mask
   Image<float> input_a = IOUtility::rgb_to_lab(IOUtility::read_rgb_image(a_name));
  
+
   // display the stored image a /*Lucie*/
   printf("number of channels of image converted in Fimage : %d \n" , input_a.get_number_of_channels()) ; /*Lucie*/
   /*channel = 3 always ! */
-  IOUtility::write_rgb_image("Image used " + a_name , input_a) ; /*Lucie*/
+  //IOUtility::write_rgb_image("Image used " + a_name , input_a) ; /*Lucie*/
   
+
 
   //Prueba funcionamiento FLST
   FLSTUtility *flst_utility = new FLSTUtility(pMinArea);

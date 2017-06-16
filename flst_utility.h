@@ -36,7 +36,8 @@ extern "C" {
 class FLSTUtility
 {
 public:
-  
+
+
   FLSTUtility(int pMinArea);
   FLSTUtility(int pMinArea, int radius);
   ~FLSTUtility();
@@ -97,12 +98,22 @@ public:
   void test_shape_without_holes();
   void test_no_repetition();
 
+
+  //Total Variation, global and local, for an auxiliary image  /*Lucie*/
+  float global_variation(Fimage auxImage) ;
+  float local_variation(Fimage auxImage, int index, int cc) ;
+
+
+
+
 private:
    int _pMinArea;
   shapes *_pTree;
   shape  **_root_to_leave;
   std::vector<std::pair<int,int>> _cc_pixel_map;
   Image<float> gaussian_weights_min_cc;
+  int call_parent;
+  int call_child ; 
 
   //Bounding box
   int _r_bb;
@@ -141,6 +152,16 @@ void create_bilateral_image(FixedImage<float> source);
 unsigned char hole(int xp, int yp, int etiquetaCC, 
       double ming, double maxg, int  *Image, int *OmegaH, unsigned char connecty8, 
       int dx, int dy);
+
+Fimage create_auxImage_parent(int index , int cc)  ; /*Lucie*/
+Fimage create_auxImage_child(int index, int cc)  ; /*Lucie*/
+Fimage prune_cc() ; /*Lucie*/
+//void prune_cc() ; /*Lucie*/
+void prune_cc(Fimage im_out) ; /*Lucie*/
+void modify_tree() ; /*Lucie*/
+void create_extended_bounding_box_cc(int r, int index, int cc) ;  /*Lucie*/
+Fimage create_patch_child(Fimage im_out, int index, int cc) ;
+Fimage create_patch_parent(Fimage im_out, int index, int cc) ;
   //////////////////////////
 
 

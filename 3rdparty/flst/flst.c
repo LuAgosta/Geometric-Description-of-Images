@@ -525,7 +525,7 @@ static void connect (Point_plane tabPoints, int iNbPoints, Connection* tabConnec
   int i, iIndex;
   Shape pShape, pParent;
   float level;
-  printf("Connect  \n");
+  //printf("Connect  \n"); /*Lucie*/
 
   for (i = iNbPoints-1; i >= 0; i--) {
     iIndex = tabPoints[i].y * iWidth + tabPoints[i].x;
@@ -538,7 +538,7 @@ static void connect (Point_plane tabPoints, int iNbPoints, Connection* tabConnec
 	pParent = pParent->parent;
       }
       insert_children(pParent, pShape);
-      printf("tabConnections[iIndex].level : %f \n", tabConnections[iIndex].level ) ; /*Lucie*/
+      //printf("tabConnections[iIndex].level : %f \n", tabConnections[iIndex].level ) ; /*Lucie*/
       tabConnections[iIndex].shape = NULL;
     }
   }
@@ -550,16 +550,16 @@ static void connect (Point_plane tabPoints, int iNbPoints, Connection* tabConnec
 static void new_connection (Point_plane pPoint, float level, Connection* tabConnections) {
   int iIndex;
   Shape pSibling, pShape = &pGlobalTree->the_shapes[pGlobalTree->nb_shapes-1];
-  printf("New connection  \n");
+  //printf("New connection  \n");
 
   iIndex = pPoint->y*iWidth + pPoint->x;
   if (tabConnections[iIndex].shape == NULL) {
     tabConnections[iIndex].shape = pShape;
     tabConnections[iIndex].level = level;
-    printf("tabConnections level : %f \n",tabConnections[iIndex].level); /*lucie*/
+    //printf("tabConnections level : %f \n",tabConnections[iIndex].level); /*lucie*/
   } else {
     assert(tabConnections[iIndex].level == level);
-    printf("tabConnections level : %f \n",tabConnections[iIndex].level); /*lucie*/
+    //printf("tabConnections level : %f \n",tabConnections[iIndex].level); /*lucie*/
     pSibling = tabConnections[iIndex].shape;
     while (pSibling->next_sibling != NULL) {
       pSibling = pSibling->next_sibling;
@@ -714,13 +714,13 @@ static void find_terminal_branch(float **ou, int** tabtabVisitedPixels,
       goto restart_branch;
     }
 
-      printf("\t A SHAPE IS DETECTED !\n"); /*Lucie*/
+     // printf("\t A SHAPE IS DETECTED !\n"); /*Lucie*/
 
-    printf("iMinArea : %d , iArea : %d \n", iMinArea , iArea) ; /*Lucie*/
-    printf("level : %f \n", level );/*Lucie*/
+    //printf("iMinArea : %d , iArea : %d \n", iMinArea , iArea) ; /*Lucie*/
+    //printf("level : %f \n", level );/*Lucie*/
 
     if (iMinArea <= iArea) { /* Store new shape? */ 
-    printf("\t A SHAPE IS STORED IN THE TREE !\n");
+    //printf("\t A SHAPE IS STORED IN THE TREE !\n"); /*Lucie*/
       iLastShapeArea = (pLastShape == NULL) ? 0 : pLastShape->area;
       pLastShape = new_shape(iArea, level, !b8Connected, pLastShape);
       if (pSmallestShape == NULL) { 
@@ -730,8 +730,8 @@ static void find_terminal_branch(float **ou, int** tabtabVisitedPixels,
 			     iArea - iLastShapeArea);
     }
 
-    printf("nb_shapes : %d \n" , pGlobalTree->nb_shapes) ; /*Lucie*/
-    printf("pLastShape: %p \n", pLastShape ) ; /*Lucie*/
+    //printf("nb_shapes : %d \n" , pGlobalTree->nb_shapes) ; /*Lucie*/
+    //printf("pLastShape: %p \n", pLastShape ) ; /*Lucie*/
 
     if (iAtBorder && iArea == iHalfAreaImage) {  /* >= ? */
       break;
@@ -751,7 +751,7 @@ static void find_terminal_branch(float **ou, int** tabtabVisitedPixels,
 
 
   if (pLastShape != NULL) {  /*If the shape is pruned there is no shape created, stored in the tree and no connection */  
-    connect(tabPointsInShape, iArea, tabConnections, pSmallestShape);  /*MAY BE HERE*/
+    connect(tabPointsInShape, iArea, tabConnections, pSmallestShape);  
     if (iAtBorder && iArea == iHalfAreaImage) {  /*the root*/
       insert_children(pGlobalTree->the_shapes, pLastShape);  
     } else if (iArea != 0) {   
@@ -770,7 +770,7 @@ static void find_terminal_branch(float **ou, int** tabtabVisitedPixels,
  */
 static void scan (float **tabtabPixelsOutput, int **tabtabVisitedPixels, 
            Neighborhood* pNeighborhood, Connection* tabConnections) {
-  printf("\t Appel de scan \n"); /*Lucie*/
+  //printf("\t Appel de scan \n"); /*Lucie*/
   /*printf("tabConnections[0].shape : %p \n", (void *)tabConnections[0].shape ) ; /*Lucie*/
 
   short int i, j;
@@ -816,7 +816,7 @@ static void scan (float **tabtabPixelsOutput, int **tabtabVisitedPixels,
 void flst (int* pMinArea, Fimage pImageInput, Shapes pTree) {
 
 
-  printf("\t Appel de flst \n"); /*Lucie*/
+  //printf("\t Appel de flst \n"); /*Lucie*/
 
   float **tabtabPixelsOutput; // Array accessing pixels of output image
   Neighborhood neighborhood;  // The neighborhood of the current region
@@ -843,7 +843,7 @@ void flst (int* pMinArea, Fimage pImageInput, Shapes pTree) {
   }
 
   pGlobalTree = mw_change_shapes(pTree, iHeight, iWidth, pImageInput->gray[0]);
-  printf("gray[0] : %f \n ", pImageInput->gray[0]) ; /*Lucie*/
+  //printf("gray[0] : %f \n ", pImageInput->gray[0]) ; /*Lucie*/
   pGlobalTree->interpolation = 0;
   tabConnections = (Connection*) malloc(iAreaImage * sizeof(Connection));
   if (tabConnections == NULL) {
@@ -863,7 +863,7 @@ void flst (int* pMinArea, Fimage pImageInput, Shapes pTree) {
   //   with only one call to `scan' and iMaxArea = iAreaImage
   iMaxArea = 0;
   do {
-    printf("iMaxArea : %d \n", iMaxArea ); 
+    //printf("iMaxArea : %d \n", iMaxArea ); /*Lucie*/
     if(iMaxArea == 0) {
       iMaxArea = INIT_MAX_AREA;
     } else {
@@ -876,8 +876,8 @@ void flst (int* pMinArea, Fimage pImageInput, Shapes pTree) {
     scan(tabtabPixelsOutput, tabtabVisitedPixels,&neighborhood,tabConnections);
   } while ((iMaxArea + 1) < iAreaImage);
 
-  printf ("\t appelExtractBranch : %d \n", appelExtractBranch) ; 
-  printf ("\t appelAddIsoLevel : %d \n", appelAddIsoLevel) ; 
+  //printf ("\t appelExtractBranch : %d \n", appelExtractBranch) ; /*Lucie*/
+  //printf ("\t appelAddIsoLevel : %d \n", appelAddIsoLevel) ; /*Lucie*/
 
   // Make connections with root
   pTree->the_shapes[0].value = tabtabPixelsOutput[0][0];

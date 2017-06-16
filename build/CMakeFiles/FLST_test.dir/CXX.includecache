@@ -38,33 +38,11 @@ sys/types.h
 list.h
 ../3rdparty/flst/list.h
 
-../3rdparty/iio/iio.h
-stdbool.h
--
-stdint.h
--
-
-/home/roberto/Desktop/FLST_Lucie/code/bilateral_filter.cpp
-bilateral_filter.h
-/home/roberto/Desktop/FLST_Lucie/code/bilateral_filter.h
-
 /home/roberto/Desktop/FLST_Lucie/code/bilateral_filter.h
 vector
 -
 image.h
 /home/roberto/Desktop/FLST_Lucie/code/image.h
-
-/home/roberto/Desktop/FLST_Lucie/code/distance_transform.cpp
-distance_transform.h
-/home/roberto/Desktop/FLST_Lucie/code/distance_transform.h
-
-/home/roberto/Desktop/FLST_Lucie/code/distance_transform.h
-vector
--
-image.h
-/home/roberto/Desktop/FLST_Lucie/code/image.h
-mask.h
-/home/roberto/Desktop/FLST_Lucie/code/mask.h
 
 /home/roberto/Desktop/FLST_Lucie/code/flst_utility.cpp
 flst_utility.h
@@ -94,19 +72,7 @@ stdio.h
 io_utility.h
 /home/roberto/Desktop/FLST_Lucie/code/io_utility.h
 
-/home/roberto/Desktop/FLST_Lucie/code/gaussian_weights.cpp
-gaussian_weights.h
 /home/roberto/Desktop/FLST_Lucie/code/gaussian_weights.h
-
-/home/roberto/Desktop/FLST_Lucie/code/gaussian_weights.h
-image.h
-/home/roberto/Desktop/FLST_Lucie/code/image.h
-
-/home/roberto/Desktop/FLST_Lucie/code/gradient.cpp
-gradient.h
-/home/roberto/Desktop/FLST_Lucie/code/gradient.h
-
-/home/roberto/Desktop/FLST_Lucie/code/gradient.h
 image.h
 /home/roberto/Desktop/FLST_Lucie/code/image.h
 
@@ -128,12 +94,6 @@ image.hpp
 image.h
 /home/roberto/Desktop/FLST_Lucie/code/image.h
 
-/home/roberto/Desktop/FLST_Lucie/code/io_utility.cpp
-io_utility.h
-/home/roberto/Desktop/FLST_Lucie/code/io_utility.h
-iio.h
-/home/roberto/Desktop/FLST_Lucie/code/iio.h
-
 /home/roberto/Desktop/FLST_Lucie/code/io_utility.h
 string
 -
@@ -150,26 +110,6 @@ image.h
 mask.h
 /home/roberto/Desktop/FLST_Lucie/code/mask.h
 
-/home/roberto/Desktop/FLST_Lucie/code/main_flst.cpp
-string
--
-ctime
--
-io_utility.h
-/home/roberto/Desktop/FLST_Lucie/code/io_utility.h
-flst_utility.h
-/home/roberto/Desktop/FLST_Lucie/code/flst_utility.h
-stdlib.h
--
-stdio.h
--
-stdexcept
--
-
-/home/roberto/Desktop/FLST_Lucie/code/mask.cpp
-mask.h
-/home/roberto/Desktop/FLST_Lucie/code/mask.h
-
 /home/roberto/Desktop/FLST_Lucie/code/mask.h
 vector
 -
@@ -177,10 +117,6 @@ stdexcept
 -
 image.h
 /home/roberto/Desktop/FLST_Lucie/code/image.h
-mask_iterator.h
-/home/roberto/Desktop/FLST_Lucie/code/mask_iterator.h
-
-/home/roberto/Desktop/FLST_Lucie/code/mask_iterator.cpp
 mask_iterator.h
 /home/roberto/Desktop/FLST_Lucie/code/mask_iterator.h
 

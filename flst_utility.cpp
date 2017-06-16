@@ -58,6 +58,9 @@ void FLSTUtility::calculate(FixedImage<float> source)
   if (_pMinArea < 0)
     _pMinArea = 1;
   Fimage input = FixedImage_to_Fimage(source);
+  // give the global or local total variation of an Fimage                                         
+  float TV = global_variation(input) ;
+  printf("TV = %f \n", TV );
   flst(&_pMinArea, input, _pTree);
   
 
@@ -72,15 +75,38 @@ void FLSTUtility::calculate(FixedImage<float> source)
 
   //Coloma: Esto creaba las bounding box. LO comento porque note hace falta
   //Bounding box function. Create a square patch around each cc.
-  // create_min_bounding_box_cc();
+  create_min_bounding_box_cc();
   // create_extended_bounding_box_cc(_r_bb);
   // create_gaussian_weigh_bounding_box(source, _sigma_c);
+ 
+  //Chose the gray value of the pruned cc /*Lucie*/ 
+
+
+  // Fimage auxImage_parent = create_auxImage_parent(3, 0) ; 
+  // float TV_parent = global_variation(auxImage_parent) ;
+  // printf("TV_parent = %f \n", TV_parent );
+  // FixedImage<float> outputParent = Fimage_to_FixedImage(auxImage_parent);
+  // IOUtility::write_mono_image("auxImageParent.png ", outputParent) ;
+
+
+  // Fimage auxImage_child = create_auxImage_child(3 , 0) ;
+  // float TV_child = global_variation(auxImage_child) ;
+  // printf("TV_child = %f \n", TV_child ); 
+  // FixedImage<float> outputChild = Fimage_to_FixedImage(auxImage_child);
+  // IOUtility::write_mono_image("auxImageChild.png ", outputChild) ;
+
+
+  // Fimage auxImage = prune_cc() ;   // diverge 
+  // FixedImage<float> output = Fimage_to_FixedImage(auxImage);
+  // IOUtility::write_mono_image("auxImage.png ", output) ;
 
 
   draw_all_cc();
   // create_bilateral_image(source);
   mw_delete_fimage(input);
-
+  //mw_delete_fimage(auxImage);
+  //mw_delete_fimage(auxImage_child);
+  //mw_delete_fimage(auxImage_parent);
 }
 
 
@@ -759,6 +785,18 @@ void FLSTUtility::create_extended_bounding_box_cc(int r){
     printf("Max BB\n");
 }
 
+void FLSTUtility::create_extended_bounding_box_cc(int r, int index, int cc){
+  int w = _pTree->ncol;
+  int h = _pTree->nrow;
+
+  shape *sh = get_shape(index);
+  sh->x_min[cc] = ((sh->x_min[cc] - r) >=  0) ? (sh->x_min[cc] - r): 0;
+  sh->y_min[cc] = ((sh->y_min[cc] - r) >=  0) ? (sh->y_min[cc] - r): 0;
+  sh->x_max[cc] = ((sh->x_max[cc] + r) <=  w) ? (sh->x_max[cc] + r ): w;
+  sh->y_max[cc] = ((sh->y_max[cc] + r) <=  h) ? (sh->y_max[cc] + r ): h;
+
+}
+
 //TODO: Rehacer los Makefile e incluir esto.
 //TODO: REvisar como es la imagen, si ya esta en lab space.
 //TODO: sigma_x, sigma_y  deber ser un valor dependiente del tamaño del patch.
@@ -1048,6 +1086,7 @@ Image<float> FLSTUtility::test_library(){
     Fimage im_out = mw_new_fimage();
 
     flst_reconstruct(_pTree, im_out);
+    prune_cc(im_out) ; 
     Image<float> output = Fimage_to_FixedImage(im_out);
     mw_delete_fimage(im_out);
     return output;
@@ -1061,7 +1100,7 @@ Image<float> FLSTUtility::test_library(FixedImage<float> source, int pMinArea){
 
     flst(&pMinArea, input, pTree);
     flst_reconstruct(pTree, im_out);
-
+    prune_cc(im_out);
     Image<float> output = Fimage_to_FixedImage(im_out);
 
     mw_delete_shapes(pTree);
@@ -1332,6 +1371,8 @@ void FLSTUtility::draw_all_cc(){
     }
   }// for(int index = 0;....)
 
+
+
    IOUtility::write_rgb_image("AllCC_" + std::to_string(_pMinArea) +  ".png", regiones);
 }
 
@@ -1559,3 +1600,372 @@ void FLSTUtility::image_normalization(
       an[i] = a[i];
     }
 }
+
+
+
+//Total Variation, global and local, for an auxiliary image  /*Lucie*/
+
+float FLSTUtility::global_variation(Fimage auxImage)
+ {
+  int ncol = auxImage->ncol ;
+  int nrow = auxImage->nrow ;
+  int x ; 
+  float gradx, grady, TV = 0 ; 
+
+  for (int i = 1 ; i < nrow - 1 ; i++){
+    for (int j = 1 ; j < ncol - 1 ; j++){
+      x = i*ncol + j ;
+      gradx = (auxImage->gray[x+1] - auxImage->gray[x-1])/2; 
+      grady = (auxImage->gray[x+ncol] - auxImage->gray[x-ncol])/2 ;
+      TV += abs(gradx) + abs(grady) ;
+    }
+  }
+  return TV ; 
+} 
+
+
+Fimage FLSTUtility::create_patch_parent(Fimage im_out, int index, int cc)  // problem with TV 
+{
+  //printf("create aux Image parent start \n");
+  call_parent++ ;
+  int w = _pTree->ncol;
+  int numPixel , numPixel_im_out ;
+
+  create_extended_bounding_box_cc(2 , index, cc);
+
+  int x_min = get_x_min_cc(index, cc) ;
+  //printf ("x_min %d call_parent:%d \n" , x_min , call_parent );
+  int x_max = get_x_max_cc(index, cc) ; 
+  //printf ("x_max %d call_parent :%d \n" , x_max , call_parent );
+  int y_min = get_y_min_cc(index, cc) ; 
+  //printf ("y_min %d call_parent :%d \n" , y_min , call_parent );
+  int y_max = get_y_max_cc(index, cc) ;
+  //printf ("y_max %d call_parent :%d \n" , y_max , call_parent );
+
+  int ncol = x_max - x_min + 1 ; 
+  int nrow = y_max - y_min + 1 ;
+
+  Fimage patch = mw_new_fimage() ; 
+  mw_change_fimage(patch, nrow, ncol) ;
+
+
+  for (int i = 0; i < ncol ; i++) {
+    for (int j = 0 ; j < nrow  ; j++){
+      numPixel = j*ncol + i ; //here ? 
+      numPixel_im_out = (j+y_min)*w + (i + x_min) ;
+      patch->gray[numPixel] = im_out->gray[numPixel_im_out]  ; 
+    }
+  }
+
+  //to optimize
+
+  int cc_nelem = get_number_elements_cc(index,cc);
+  for (int j = 0; j < cc_nelem; j++){
+    const int x = get_tp_coord_x_cc(index, cc, j) - x_min;
+    const int y = get_tp_coord_y_cc(index, cc, j) - y_min;
+    numPixel = y*ncol + x ; 
+    if (_pTree->the_shapes[index].parent == NULL) { // to optimize !!
+      patch->gray[numPixel] = _pTree->the_shapes[index].value ;
+    }
+    else {
+      patch->gray[numPixel] = _pTree->the_shapes[index].parent->value ; 
+    }
+  }    
+
+  //FixedImage<float> Fpatch = Fimage_to_FixedImage(patch); //delete ?
+  //IOUtility::write_mono_image("patch_parent.png", Fpatch);  
+
+
+  create_extended_bounding_box_cc(-2 , index, cc);
+  //printf("create aux Image parent end \n");
+  return patch ; 
+}
+
+Fimage FLSTUtility::create_patch_child(Fimage im_out, int index, int cc)  //problem with TV 
+{
+  //printf("create aux Image child start \n");
+  call_child++ ;
+  int w = _pTree->ncol;
+  int numPixel , numPixel_im_out ; 
+
+  create_extended_bounding_box_cc(2 , index, cc);
+
+  int x_min = get_x_min_cc(index, cc) ;
+  //printf ("x_min %d call_child :%d \n" , x_min , call_child );
+  int x_max = get_x_max_cc(index, cc) ; 
+  //printf ("x_max %d call_child :%d \n" , x_max , call_child );
+  int y_min = get_y_min_cc(index, cc) ; 
+  //printf ("y_min %d call_child :%d \n" , y_min , call_child );
+  int y_max = get_y_max_cc(index, cc) ;
+  //printf ("y_max %d call_child :%d \n" , y_max , call_child );
+
+  int ncol = x_max - x_min + 1  ; 
+  int nrow = y_max - y_min + 1;
+
+  Fimage patch = mw_new_fimage() ; 
+  mw_change_fimage(patch, nrow, ncol) ;
+
+
+  for (int i = 0; i < ncol  ; i++) {
+    for (int j = 0 ; j < nrow  ; j++){
+      numPixel = j*ncol + i ; //here ? 
+      numPixel_im_out = (j+y_min)*w + (i + x_min) ;
+      patch->gray[numPixel] = im_out->gray[numPixel_im_out]  ; 
+    }
+  }
+
+
+
+  //to optimize
+
+  int cc_nelem = get_number_elements_cc(index,cc);
+  for (int j = 0; j < cc_nelem; j++){
+    const int x = get_tp_coord_x_cc(index, cc, j) - x_min;
+    const int y = get_tp_coord_y_cc(index, cc, j) - y_min ;
+    numPixel = y*ncol + x ; 
+    if (_pTree->the_shapes[index].child == NULL) { // to optimize !!
+      patch->gray[numPixel] = _pTree->the_shapes[index].value ;
+    }
+    else {
+      patch->gray[numPixel] = _pTree->the_shapes[index].child->value ; 
+    }
+  }    
+
+  //FixedImage<float> Fpatch = Fimage_to_FixedImage(patch); 
+  //IOUtility::write_mono_image("patch_child.png", Fpatch);
+
+  create_extended_bounding_box_cc(-2 , index, cc);
+  //printf("create aux Image child end \n");
+  return patch ; 
+}
+
+
+Fimage FLSTUtility::create_auxImage_parent(int index, int cc){  //create an image of size of the image and replace the value of the cc of index by parent value
+  call_parent++ ;
+  int nb_shapes = get_number_of_shapes() ; 
+  int w = _pTree->ncol;
+  int h = _pTree->nrow;
+  int numPixel ; 
+
+
+  Fimage auxImage = mw_new_fimage() ; 
+  mw_change_fimage(auxImage, h, w) ;
+
+  for (int shape = 0; shape < nb_shapes; shape++){
+    const int cc_n = get_number_of_cc(shape); // why const ? 
+    for (int l = 0; l < cc_n; l++){
+      int cc_nelem = get_number_elements_cc(shape,l);
+        for (int j = 0; j < cc_nelem; j++){
+          const int x = get_tp_coord_x_cc(shape, l, j);
+          const int y = get_tp_coord_y_cc(shape, l, j);
+          numPixel = y*w + x ; 
+          if (shape != index || l != cc){
+            auxImage->gray[numPixel] = _pTree->the_shapes[shape].value ; 
+          }
+          else { 
+            if (_pTree->the_shapes[shape].parent == NULL) { // to optimize !!
+              auxImage->gray[numPixel] = _pTree->the_shapes[shape].value ;
+            }
+            else {
+              auxImage->gray[numPixel] = _pTree->the_shapes[shape].parent->value ; 
+            }
+          }    
+        }
+      
+    }
+  }
+
+  //FixedImage<float> FauxImage = Fimage_to_FixedImage(auxImage); 
+  //IOUtility::write_mono_image("patch.png", FauxImage);      
+
+
+  return auxImage ;
+}
+
+
+Fimage FLSTUtility::create_auxImage_child(int index, int cc) {  //create an image of size of the image and replace the value of the cc of index by child value 
+  call_child++ ; 
+  int nb_shapes = get_number_of_shapes() ; 
+  int w = _pTree->ncol;
+  int h = _pTree->nrow;
+  int numPixel ; 
+
+
+  Fimage auxImage = mw_new_fimage() ; 
+  mw_change_fimage(auxImage, h, w) ;
+
+  for (int shape = 0; shape < nb_shapes; shape++){
+    const int cc_n = get_number_of_cc(shape); // why const ? 
+    for (int l = 0; l < cc_n; l++){
+      int cc_nelem = get_number_elements_cc(shape,l);
+      for (int j = 0; j < cc_nelem; j++){
+        const int x = get_tp_coord_x_cc(shape, l, j);
+        const int y = get_tp_coord_y_cc(shape, l, j);
+        numPixel = y*w + x ; 
+        if (shape != index || l != cc){
+          auxImage->gray[numPixel] = _pTree->the_shapes[shape].value ; 
+        }
+        else { 
+          if (_pTree->the_shapes[shape].child == NULL) { // to optimize !!
+            auxImage->gray[numPixel] = _pTree->the_shapes[shape].value ;
+          }
+          else {
+            auxImage->gray[numPixel] = _pTree->the_shapes[shape].child->value ; 
+          }
+        }      
+      }  
+    }
+  }
+
+  //FixedImage<float> FauxImage = Fimage_to_FixedImage(auxImage); 
+  //IOUtility::write_mono_image("patch.png", FauxImage);      
+  return auxImage ;
+}
+
+
+void FLSTUtility::prune_cc(Fimage im_out){  //modify the output Fimage pointer ?? 
+  printf("Call of prune_cc \n") ; 
+  int nb_shapes = get_number_of_shapes() ;
+  int w = _pTree->ncol ,ncol , x_min , y_min;
+  int numPixel, numPixel_auxImage;
+  float global_variation_child , global_variation_parent ; 
+
+
+  for (int index = 0; index < nb_shapes ; index ++){
+    int cc_n = get_number_of_cc(index); 
+    if (cc_n > 1){
+     for (int i = 0; i < cc_n; i++ ){ 
+      int cc_nelem = get_number_elements_cc(index,i);
+        if (cc_nelem < _pMinArea) {
+          Fimage auxImage_child = create_patch_child(im_out, index, i) ;  //create at the begining ? 
+          Fimage auxImage_parent = create_patch_parent(im_out, index, i) ;
+          global_variation_parent = global_variation(auxImage_parent) ;
+          //printf("TV parent : %f \n ", global_variation_parent);
+          global_variation_child = global_variation(auxImage_child) ;
+          //printf("TV child : %f \n ", global_variation_child);
+          ncol = auxImage_child->ncol ; //
+          x_min =  get_x_min_cc(index, i)  ; //
+          //printf("xmin prune : %d \n",x_min );
+          y_min =  get_y_min_cc(index, i) ; //
+          for (int j = 0; j < cc_nelem; j++){
+            const int x = get_tp_coord_x_cc(index, i, j) ;
+            const int y = get_tp_coord_y_cc(index, i, j) ;
+            numPixel = y*w + x ; 
+            numPixel_auxImage = (y + 2 - y_min)*ncol + (x + 2 - x_min) ; // 
+            if (global_variation_child < global_variation_parent) {  
+               im_out->gray[numPixel] = auxImage_child->gray[numPixel_auxImage] ; //
+            }            
+            else {
+              im_out->gray[numPixel] = auxImage_parent->gray[numPixel_auxImage] ; 
+            }
+          } 
+          mw_delete_fimage(auxImage_child);
+          mw_delete_fimage(auxImage_parent);
+        }
+      }
+    }
+  }
+  printf("number of call of create_auxImage_parent : %d\n", call_parent );
+  printf("number of call of create_auxImage_child : %d\n", call_child );
+}
+
+
+Fimage FLSTUtility::prune_cc() { // create an auxiliary image but diverge with a high number of shapes 
+
+  printf("Call of prune_cc \n") ; 
+  int nb_shapes = get_number_of_shapes() ;
+  int w = _pTree->ncol , h = _pTree->nrow, ncol , x_min , y_min;
+  int numPixel, numPixel_auxImage;
+  float global_variation_child , global_variation_parent ; 
+
+  Fimage auxImage = mw_new_fimage() ; 
+  mw_change_fimage(auxImage, h, w) ;
+
+
+  for (int index = 0; index < nb_shapes ; index ++){
+    int cc_n = get_number_of_cc(index); 
+    if (cc_n > 1){
+     for (int i = 0; i < cc_n; i++ ){ 
+      int cc_nelem = get_number_elements_cc(index,i);
+        if (cc_nelem < _pMinArea) {
+          Fimage auxImage_child = create_patch_child(auxImage, index, i) ;  //create at the begining ? 
+          Fimage auxImage_parent = create_patch_parent(auxImage, index, i) ;
+          global_variation_parent = global_variation(auxImage_parent) ;
+          //printf("TV parent : %f \n ", global_variation_parent);
+          global_variation_child = global_variation(auxImage_child) ;
+          //printf("TV child : %f \n ", global_variation_child);
+          ncol = auxImage_child->ncol ; //
+          x_min =  get_x_min_cc(index, i)  ; //
+          //printf("xmin prune : %d \n",x_min );
+          y_min =  get_y_min_cc(index, i) ; //
+          for (int j = 0; j < cc_nelem; j++){
+            const int x = get_tp_coord_x_cc(index, i, j) ;
+            const int y = get_tp_coord_y_cc(index, i, j) ;
+            numPixel = y*w + x ; 
+            numPixel_auxImage = (y + 2 - y_min)*ncol + (x + 2 - x_min) ; // 
+            if (global_variation_child < global_variation_parent) {  
+               auxImage->gray[numPixel] = auxImage_child->gray[numPixel_auxImage] ; //
+            }            
+            else {
+              auxImage->gray[numPixel] = auxImage_parent->gray[numPixel_auxImage] ; 
+            }
+          } 
+          mw_delete_fimage(auxImage_child);
+          mw_delete_fimage(auxImage_parent);
+        }
+      }
+    }
+  }
+
+  printf("number of call of create_auxImage_parent : %d\n", call_parent );
+  printf("number of call of create_auxImage_child : %d\n", call_child );
+
+  return auxImage ; 
+}
+
+
+// void FLSTUtility::prune_cc() { // modify the tree but too complicated and not reliable 
+
+//   int nb_shapes = get_number_of_shapes() ; 
+//   int w = _pTree->ncol;
+//   int h = _pTree->nrow;
+
+
+//   for (int index = 0; index < nb_shapes ; index ++){
+//     int cc_n = get_number_of_cc(index); 
+//     if (cc_n > 1){
+//      for (int i = 0; i < cc_n; i++ ){ 
+//       int cc_nelem = get_number_elements_cc(index,i);
+//         if (cc_nelem < _pMinArea) {
+//           Fimage auxImage_parent = create_auxImage_parent(index, i) ;
+//           Fimage auxImage_child = create_auxImage_child(index, i) ;  
+//           if (global_variation(auxImage_child) < global_variation(auxImage_parent)) {  
+//             for (int j = 0; j < cc_nelem; j++){
+//               if (_pTree->the_shapes[index].child == NULL) {
+//                 return ; 
+//               }
+//               else {
+//                 modify_tree() ;
+//               }
+//             }
+//           }
+//           else {
+//             for (int j = 0; j < cc_nelem; j++){
+//               if (_pTree->the_shapes[index].parent == NULL) {
+//                 return;
+//               }
+//               else {
+//                 modify_tree() ; 
+//               }
+//             }
+//           } 
+//         }
+//       }
+//     }  
+//   }
+
+//   return ; 
+// }
+
+
+
